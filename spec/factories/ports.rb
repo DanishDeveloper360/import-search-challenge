@@ -1,6 +1,6 @@
 FactoryBot.define do
     factory :port do
-      name { Faker::Lorem.word }
+      name { Faker::Name.unique.name }
       code { Faker::Name.unique.name }
       created_at { Faker::Date.between(from: 2.days.ago, to: Date.today) }
       updated_at { Faker::Date.between(from: 2.days.ago, to: Date.today) }

@@ -61,16 +61,23 @@ class PortsController < ApplicationController
     def search
       if(params[:code])
         @port = Port.find_by_code(params[:code])
-        json_response(@port)
+
       elsif(params[:name])
         
         @port = Port.where("name LIKE :query", query: "%#{params[:name]}%")
-        json_response(@port)    
+          
       elsif(params[:portType])
         #TODO: implement pagination
         @port = Port.joins(:port_type).where("port_types.name = ?", params[:portType]).limit(10)
-        json_response(@port)          
+                  
       end
+
+      if(@port.blank?) 
+        json_response("Couldn't find Port", :not_found)
+      else
+          json_response(@port)
+      end
+      
     end
   
     private

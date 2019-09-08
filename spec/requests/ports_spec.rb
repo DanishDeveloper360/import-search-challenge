@@ -2,17 +2,20 @@ require 'rails_helper'
 
 RSpec.describe 'Ports API', type: :request do
   # initialize test data 
+  let(:user) { create(:user) }
   let!(:port_type) { create(:port_type) }
   let!(:ports) { create_list(:port, 10, port_type_id: port_type.id) }
   let(:port_type_id) { port_type.id }
   let(:port_id) { ports.first.id }
   let(:port_code) { ports.first.code }
   let(:port_name) { ports.first.name }
+  # authorize request
+  let(:headers) { valid_headers }
 
   # Test suite for GET /ports
   describe 'GET /ports' do
     # make HTTP get request before each example
-    before { get '/ports' }
+    before { get '/ports', params: {}, headers: headers }
 
     it 'returns ports' do
       # Note `json` is a custom helper to parse JSON responses
@@ -28,7 +31,7 @@ RSpec.describe 'Ports API', type: :request do
   # Test suite for GET /ports/search?code=port_code
   describe 'GET /ports/search code' do
     # make HTTP get request before each example
-    before { get "/ports/search?code=#{port_code}" }
+    before { get "/ports/search?code=#{port_code}", params: {}, headers: headers }
 
     context 'when port exists' do
         it 'returns status code 200' do
@@ -56,7 +59,7 @@ RSpec.describe 'Ports API', type: :request do
     # Test suite for GET /ports/search?name=port_name
   describe 'GET /ports/search name' do
         # make HTTP get request before each example
-        before { get "/ports/search?name=#{port_name}" }
+        before { get "/ports/search?name=#{port_name}", params: {}, headers: headers }
     
         context 'when port exists' do
             it 'returns status code 200' do

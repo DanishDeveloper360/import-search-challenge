@@ -1,0 +1,2 @@
+class PortType < ApplicationRecord
+end

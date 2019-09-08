@@ -4,4 +4,5 @@ Rails.application.routes.draw do
       get 'search'
     end
   end
+  post 'auth/login', to: 'authentication#authenticate'
 end

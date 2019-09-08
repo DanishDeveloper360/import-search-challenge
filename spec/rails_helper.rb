@@ -39,8 +39,9 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.include RequestSpecHelper, type: :request
-
+  config.include RequestSpecHelper
+  config.include ControllerSpecHelper
+  
   # start the transaction strategy as examples are run
   config.around(:each) do |example|
     DatabaseCleaner.cleaning do

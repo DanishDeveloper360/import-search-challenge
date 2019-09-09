@@ -1,24 +1,29 @@
 module V1
   class PortsController < ApplicationController
-      before_action :set_port, only: [:show, :update, :destroy]
+      before_action :set_port, only: [:show, :destroy]
 
       # GET /ports
       def index
-        @ports = Port.all
+        @ports = Port.all.paginate(page: 1, per_page: 20)
         json_response(@ports)
       end
     
       # POST /ports
       def create
+        if not (params[:file]).present?
+          return json_response({ message: Message.file_not_found }, :not_found)
+        elsif params[:file].content_type != "text/csv"
+          return json_response({ message: Message.unsupported_media_type }, :unsupported_media_type)
+        end
+
         file_path = params[:file].path
-        portType = []
         ports = []
-        # columns = [:name, :code, city]
         portTypes = PortType.all.select(:id, :name).take(10)
         
         CSV.foreach(file_path, headers: true) do |row|
 
-          # propTypeId = portTypes.select(name: row[10])
+          raise(ExceptionHandler::HeaderCorrupt, Message.header_corrupt) unless ['Name', 'Code', 'City', 'Port type', 'Oceans insights code','Latitude', 'Longitude', 'Bigschedules' ].all? { |header| row.headers.include? header }
+
           propTypeForRow = portTypes.select {|e| e[:name] == row['Port type']}
 
           if propTypeForRow.count <= 0
@@ -28,7 +33,6 @@ module V1
             portTypes = PortType.all.select(:id, :name).take(10)
             propTypeForRow = portTypes.select {|e| e[:name] == row['Port type']}
           end
-          # Id	Name	Code	City	Oceans insights code	Latitude	Longitude	Bigschedules	Created at	Updated at	Port type	Hub port	Ocean insights
           newPort = { :name => row['Name'], :code => row['Code'], :city => row['City'], 
           :oceans_insights_code => row['Oceans insights code'], :lat => row['Latitude'], :lng => row['Longitude'], :big_schedules => row['Bigschedules'], 
           :created_at => row['Created at'].blank? ? Date.today() : DateTime.parse(row['Created at']), 
@@ -36,21 +40,15 @@ module V1
           :port_type_id => propTypeForRow[0][:id] }
           ports << newPort
         end
+
         Port.import ports, validate: false, on_duplicate_key_update: { conflict_target: [:code], columns: [ :name, :city, :lat, :lng, :port_type_id, :big_schedules, :oceans_insights_code ] }
         
-        json_response({ message: 'Records uploaded successfully', count: ports.count }, :created)
+        json_response({ message: 'Ports uploaded successfully', count: ports.count }, :created)
       end
     
       # GET /ports/:id
       def show
-        Port.where(code: params[:code])
         json_response(@port)
-      end
-    
-      # PUT /ports/:id
-      def update
-        @port.update(port_params)
-        head :no_content
       end
     
       # DELETE /ports/:id
@@ -60,33 +58,35 @@ module V1
       end
 
       def search
-        if(params[:code])
-          @port = Port.find_by_code(params[:code])
+        if params[:pageSize].blank?
+          params[:pageSize] = 10
+        end
 
-        elsif(params[:name])
-          
-          @port = Port.where("name LIKE :query", query: "%#{params[:name]}%")
+        if params[:page].blank?
+          params[:page] = 1
+        end
+
+        if(params[:code])
+          @port = Port.find_by_code(params[:code]).paginate(page: params[:page], per_page: params[:pageSize])
+
+        elsif(params[:name])          
+          @port = Port.where("name LIKE :query", query: "%#{params[:name]}%").paginate(page: params[:page], per_page: params[:pageSize])
             
         elsif(params[:portType])
-          #TODO: implement pagination
-          @port = Port.joins(:port_type).where("port_types.name = ?", params[:portType]).limit(10)
-                    
+          @port = Port.WithPortType().where("port_types.name = ?", params[:portType]).paginate(page: params[:page], per_page: params[:pageSize])
+        else
+          @port = nil    
         end
 
         if(@port.blank?) 
           json_response("Couldn't find Port", :not_found)
         else
-            json_response(@port)
+          json_response(@port)
         end
         
       end
     
       private
-    
-      def port_params
-        # whitelist params
-        params.permit(:name, :code)
-      end
     
       def set_port
         @port = Port.find(params[:id])

@@ -30,4 +30,17 @@ class Message
   def self.expired_token
     'Sorry, your token has expired. Please login to continue.'
   end
+
+  def self.file_not_found
+    'no file uploaded, expected csv'
+  end
+
+  def self.unsupported_media_type
+    'unsupported format, expected csv'
+  end
+
+  def self.header_corrupt
+    'csv header is corrupt or not found'
+  end
+
 end

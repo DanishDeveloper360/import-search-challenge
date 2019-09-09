@@ -1,24 +1,26 @@
-# README
+# Rails Challenge
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Technical details
+* Ruby/Rails: Rails 6.0.0 
+* Database: `PostgreSQL 9.6+`
+* Documentation: POSTMAN Documentation view here --> https://documenter.getpostman.com/view/3200410/SVmpWh5x?version=latest
+* Testing:
+    * rspec-rails - Testing framework.
+    * factory_bot_rails - A fixtures replacement with a more straightforward syntax. 
+    * shoulda_matchers - Provides RSpec with additional matchers.
+    * database_cleaner - You guessed it! It literally cleans our test database to ensure a clean state in each test suite.
+    * faker - A library for generating fake data. We'll use this to generate test data.
 
-Things you may want to cover:
+## Steps to run : 
 
-* Ruby version
+1. bundle install
+2. config/database.yml change username and use your OS username for Postgresql
+3. rake db:create db:migrate
+4. rails s
 
-* System dependencies
+## start rails server
+    rails s
 
-* Configuration
+## To run specs
+    bundle exec rspec
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...

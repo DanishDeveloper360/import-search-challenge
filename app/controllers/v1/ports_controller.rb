@@ -53,11 +53,10 @@ module V1
         end
 
         if(@port.blank?) 
-          json_response("Couldn't find Port", :not_found)
+          json_response({ message: Message.not_found(Port) }, :not_found)
         else
           json_response(@port)
         end
-        
       end
     
       private

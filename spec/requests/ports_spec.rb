@@ -51,7 +51,7 @@ RSpec.describe 'Ports API', type: :request do
         end
   
         it 'returns a not found message' do
-          expect(response.body).to match(/Couldn't find Port/)
+          expect(json['message']).to match(/Sorry, Port not found./)
         end
     end
   end
@@ -83,7 +83,7 @@ RSpec.describe 'Ports API', type: :request do
             end
       
             it 'returns a not found message' do
-              expect(response.body).to match(/Couldn't find Port/)
+              expect(json['message']).to match(/Sorry, Port not found./)
             end
         end
   end

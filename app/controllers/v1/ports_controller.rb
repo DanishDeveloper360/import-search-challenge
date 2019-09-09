@@ -44,7 +44,8 @@ module V1
           @port = Port.find_by_code(params[:code])
           
         elsif(params[:name])          
-          @port = Port.where("name LIKE :query", query: "%#{params[:name]}%").paginate(page: params[:page], per_page: params[:pageSize])
+          downcase_query = params[:name].downcase()
+          @port = Port.where("name ILIKE :query", query: "%#{downcase_query}%").paginate(page: params[:page], per_page: params[:pageSize])
             
         elsif(params[:portType])
           @port = Port.WithPortType().where("port_types.name = ?", params[:portType]).paginate(page: params[:page], per_page: params[:pageSize])

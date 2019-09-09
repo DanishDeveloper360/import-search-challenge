@@ -3,7 +3,7 @@
 ## Technical details
 * Ruby/Rails: Rails 6.0.0 
 * Database: `PostgreSQL 9.6+`
-* Documentation: POSTMAN Documentation view here --> https://documenter.getpostman.com/view/3200410/SVmpWh5x?version=latest
+* Documentation: POSTMAN Documentation for PORTS API plese view here --> https://documenter.getpostman.com/view/3200410/SVmpWh5x?version=latest
 * Testing:
     * rspec-rails - Testing framework.
     * factory_bot_rails - A fixtures replacement with a more straightforward syntax. 

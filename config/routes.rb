@@ -9,6 +9,8 @@ Rails.application.routes.draw do
     resources :ports do
       collection do
         get 'search'
+        get 'search_full_text'
+        get 'search_partial_text'
       end
     end
   end 

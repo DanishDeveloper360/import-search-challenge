@@ -88,4 +88,77 @@ RSpec.describe 'Ports API', type: :request do
         end
   end
 
+  
+    # Test suite for GET /ports/search_partial_text?text=search_string_as_desired
+  describe 'GET /ports/search_partial_text' do
+      # make HTTP get request before each example
+      before { get "/ports/search_partial_text?text=#{port_name.slice(0..2)}", params: {}, headers: headers }
+  
+      context 'when port exists' do
+          it 'returns status code 200' do
+            expect(response).to have_http_status(200)
+          end
+    
+          it 'returns the port array' do
+            expect(json.count).to be > 0
+          end
+
+          it 'returns the port array' do
+            expect(json[0]['name']).to include(port_name)
+          end
+
+          it 'returns the port array' do
+            match_string = port_name.slice(0..2)
+            is_mis_match = json.any? { |item| !(item['name'].include? match_string) && !(item['code'].include? match_string) && !(item['city'].include? match_string) && !(item['oceans_insights_code'].include? match_string) }
+
+            expect(is_mis_match).to be false
+          end
+
+      end
+    
+      context 'when port does not exist' do
+          let(:port_name) { 'zzzzzzzzzzzzzzzzzz' }
+    
+          it 'returns status code 404' do
+            expect(response).to have_http_status(404)
+          end
+    
+          it 'returns a not found message' do
+            expect(json['message']).to match(/Sorry, Port not found./)
+          end
+      end
+  end
+
+
+      # Test suite for GET /ports/search_full_text?text=search_string_as_desired
+  describe 'GET /ports/search_full_text' do
+        # make HTTP get request before each example
+        before { get "/ports/search_full_text?text=#{port_name.slice(0..2)}", params: {}, headers: headers }
+    
+        context 'when port exists' do
+            it 'returns status code 200' do
+              expect(response).to have_http_status(200)
+            end
+      
+            it 'returns the port array' do
+              expect(json.count).to be > 0
+            end
+  
+            it 'returns the port array' do
+              match_string = port_name.slice(0..2)
+              expect(json[0]['name']).to include(match_string)
+            end
+
+        end
+      
+        context 'when port does not exist' do
+            let(:port_name) { 'zzzzzzzzzzzzzzzzzz' }
+      
+            it 'returns status code 404' do
+              expect(response).to have_http_status(404)
+            end
+      
+        end
+  end
+
 end

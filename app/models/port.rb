@@ -5,8 +5,23 @@ class Port < ApplicationRecord
   # validations
   validates_presence_of :name, :code
 
+  include PgSearch
+  pg_search_scope :search, against: [:name, :code, :city, :oceans_insights_code, :created_at, :updated_at], 
+  associated_against: {
+    port_type: [ :name ]
+  },
+    using: {
+        tsearch: {
+            prefix: true
+        }
+    }
+
   def self.WithPortType
     Port.joins(:port_type).select("ports.*, port_types.name as port_type_name")
+  end
+
+  def self.search_partial_text(downcase_query)
+    Port.joins(:port_type).where("port_types.name ILIKE :query OR ports.name ILIKE :query OR code ILIKE :query OR city ILIKE :query OR oceans_insights_code ILIKE :query", query: "%#{downcase_query}%").select("ports.*, port_types.name as port_type_name")
   end
   
   # Import CSV ports data

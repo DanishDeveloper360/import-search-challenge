@@ -57,3 +57,5 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'jwt'
 
 gem 'will_paginate', '~> 3.1.0'
+
+gem 'pg_search'

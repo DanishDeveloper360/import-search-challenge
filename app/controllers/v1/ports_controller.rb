@@ -32,6 +32,7 @@ module V1
       end
 
       def search
+
         if params[:pageSize].blank?
           params[:pageSize] = 10
         end
@@ -48,7 +49,7 @@ module V1
           @port = Port.where("name ILIKE :query", query: "%#{downcase_query}%").paginate(page: params[:page], per_page: params[:pageSize])
             
         elsif(params[:portType])
-          @port = Port.WithPortType().where("port_types.name = ?", params[:portType]).paginate(page: params[:page], per_page: params[:pageSize])
+          @port = Port.WithPortType().where("port_types.name = ?", params[:portType]).paginate(page: params[:page], per_page: params[:pageSize])        
         else
           @port = nil    
         end
@@ -59,15 +60,40 @@ module V1
           json_response(@port)
         end
       end
-    
+
+      def search_full_text
+        ports_data = Port.search(params[:text])
+        if(ports_data.blank?) 
+          json_response({ message: Message.not_found(Port) }, :not_found)
+        else
+          json_response(ports_data)
+        end
+      end 
+
+      def search_partial_text
+        if params[:pageSize].blank?
+          params[:pageSize] = 10
+        end
+
+        if params[:page].blank?
+          params[:page] = 1
+        end
+
+        downcase_query = params[:text].downcase()
+        ports_data = Port.search_partial_text(downcase_query).paginate(page: params[:page], per_page: params[:pageSize])
+        
+        if(ports_data.blank?) 
+          json_response({ message: Message.not_found(Port) }, :not_found)
+        else
+          json_response(ports_data)
+        end
+
+      end 
+
       private
     
       def set_port
         @port = Port.find(params[:id])
-      end
-
-      def is_csv_expected_format
-        
       end
       
   end
